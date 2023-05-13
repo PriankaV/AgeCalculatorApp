@@ -1,0 +1,52 @@
+import datetime
+from kivy.app import App
+from kivy.lang import Builder
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
+from kivy.uix.button import Button
+
+
+class AgeCalculator(BoxLayout):
+    def calculate_age(self):
+        try:
+            dob = datetime.datetime.strptime(self.ids.dob.text, "%m/%d/%Y").date()
+            age = datetime.date.today().year - dob.year - ((datetime.date.today().month, datetime.date.today().day) < (dob.month, dob.day))
+            self.ids.result.text = f"You are {age} years old"
+        except ValueError:
+            self.ids.result.text = "Invalid date format. Please enter in MM/DD/YYYY format"
+
+
+class AgeCalculatorApp(App):
+    def build(self):
+        # Create the main layout
+        layout = BoxLayout(orientation="vertical", spacing=20, padding=30)
+
+        # Add a title label
+        title = Label(text="Age Calculator", font_size=40, halign="center", valign="middle")
+        layout.add_widget(title)
+
+        # Add a label and text input for the date of birth
+        dob_label = Label(text="Enter your date of birth:", font_size=20, halign="left", valign="middle")
+        dob_input = TextInput(hint_text="MM/DD/YYYY", font_size=20, size_hint=(1, 0.5), input_filter="int")
+        layout.add_widget(dob_label)
+        layout.add_widget(dob_input)
+
+        # Add a button to calculate the age
+        calculate_button = Button(text="Calculate Age", font_size=20, size_hint=(0.5, 0.5), pos_hint={"center_x": 0.5})
+        calculate_button.bind(on_press=lambda x: self.root.calculate_age())
+        layout.add_widget(calculate_button)
+
+        # Add a label to display the result
+        result_label = Label(text="", font_size=30, halign="center", valign="middle")
+        layout.add_widget(result_label)
+
+        # Set the root widget
+        self.root = AgeCalculator()
+        self.root.add_widget(layout)
+
+        return self.root
+
+
+if __name__ == "__main__":
+    AgeCalculatorApp().run()
